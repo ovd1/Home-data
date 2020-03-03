@@ -1,3 +1,6 @@
+#ifndef LCD_H_
+#define LCD_H_
+
 #include <avr/io.h>
 #include <stdio.h>
 #include <util/delay.h>
@@ -29,7 +32,6 @@
 
 #define lcd_LineOne     0x00                    
 #define lcd_LineTwo     0x40  
-
  
 #define lcd_Clear           0b00000001          // replace all characters with ASCII 'space'
 #define lcd_Home            0b00000010          // return cursor to first position on first line
@@ -47,3 +49,4 @@ void lcd_write_character_4d(uint8_t);
 void lcd_write_string_4d(uint8_t *);
 void lcd_init_4d(void);
 
+#endif

@@ -1,3 +1,6 @@
+#ifndef DHT11_H_
+#define DHT11_H_
+
 #include <avr/io.h>
 #include <stdio.h>
 
@@ -14,3 +17,4 @@ uint8_t dht11_getdata(uint8_t);
 uint8_t dht11_gettemperature(); 
 uint8_t dht11_gethumidity();
 
+#endif
