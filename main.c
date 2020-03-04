@@ -32,15 +32,12 @@ void USART0SendByte(uint8_t u8Data) {
     // Transmit data
     UDR0 = u8Data;
 }
-
 uint8_t USART0ReceiveByte() {
     // Wait for byte to be received
     while(!(UCSR0A&(1<<RXC0))){};
     // Return received data
     return UDR0;
 }
-
-
 */
 
 int main(void)
@@ -100,11 +97,6 @@ int main(void)
     
     return 0;
 }
-
-
-
-
-
 
 
 

@@ -4,7 +4,7 @@
 #include <unistd.h>  
 #include <errno.h>   
 
-#include "ser.h"
+#include "uart.h"
 
 int get_temp_humid(char *read_buffer, int size)
 {

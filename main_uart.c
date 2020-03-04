@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>  
  
-#include "ser.h"
+#include "uart.h"
 
 
 void main(void)
