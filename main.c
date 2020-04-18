@@ -25,7 +25,7 @@ void USART0Init(void) {
     //enable transmission and reception
     UCSR0B |= (1<<RXEN0)|(1<<TXEN0);
 }
-/*
+
 void USART0SendByte(uint8_t u8Data) {
     //wait while previous byte is completed
     while(!(UCSR0A&(1<<UDRE0))){};
@@ -38,7 +38,7 @@ uint8_t USART0ReceiveByte() {
     // Return received data
     return UDR0;
 }
-*/
+
 
 int main(void)
 {
@@ -64,39 +64,38 @@ int main(void)
    
     while(1){
         int i = 0;
+        while (USART0ReceiveByte() != 'm');
         
         humidity = dht11_gethumidity();
         _delay_ms(1000); 
         temperature = dht11_gettemperature();
         
-        sprintf(buf_t, "T=%02d ", temperature);
+        sprintf(buf_t, "T=%02d", temperature);
         lcd_write_string_4d(buf_t);
         
         lcd_write_instruction_4d(lcd_SetCursor | lcd_LineTwo);
                         
-        sprintf(buf_h, "H=%02d ", humidity);
+        sprintf(buf_h, "H=%02d", humidity);
         lcd_write_string_4d(buf_h);
         lcd_write_instruction_4d(lcd_SetCursor | lcd_LineTwo);
            
-        _delay_ms(1000); 
+        _delay_ms(1000);
+        
                 
-        while(buf_h[i] != 0) /* print the String  "Hello from ATmega328p" */
+        while(buf_h[i] != 0) 
         {
-            while (!( UCSR0A & (1<<UDRE0))); /* Wait for empty transmit buffer*/
-            UDR0 = buf_h[i];/* Put data into buffer, sends the data */
-            i++;                             /* increment counter           */
+            while (!( UCSR0A & (1<<UDRE0))); 
+            UDR0 = buf_h[i];
+            i++;                             
         }
         i = 0;
-        while(buf_t[i] != 0) /* print the String  "Hello from ATmega328p" */
+        while(buf_t[i] != 0) 
         {
-            while (!( UCSR0A & (1<<UDRE0))); /* Wait for empty transmit buffer*/
-            UDR0 = buf_t[i];/* Put data into buffer, sends the data */
-            i++;                             /* increment counter           */
+            while (!( UCSR0A & (1<<UDRE0))); 
+            UDR0 = buf_t[i];
+            i++;                            
         }
     }
     
     return 0;
 }
-
-
-

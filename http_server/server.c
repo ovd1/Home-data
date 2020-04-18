@@ -15,6 +15,9 @@
 #include "http_server.c"
 #include "http_server.h"
 
+static const char response_data[] = "HTTP/1.1 200 OK\r\n"
+"Content-Type: text/html; charset=UTF-8\r\n\r\n";
+
 
 static const char response_header_200Ok[] = "HTTP/1.1 200 OK\r\n"
 "Content-Type: text/html; charset=UTF-8\r\n\r\n";
@@ -33,7 +36,7 @@ static const char resp_400[] = "HTTP/1.1 400 Bad Request\r\n"
 int main()
 {
     int sockfd, comp, port; 
-    char buf[1024], buf2[1024] = "html_doc"; 
+    static char buf[1024], buf2[1024] = "html_doc"; 
     const char *host;
     
     sockfd = startServer(host, port);
@@ -61,11 +64,40 @@ int main()
             
             if (strcmp(buf2+sizeof("html_doc"), "data") == 0)
             {
-                int data_read = get_temp_humid(buf, sizeof(buf)); 
+                int data_read = get_temp_humid(buf, 8);
+                buf[8] = '\0'; 
+                
                 if (data_read > 0) 
                 {
                     write(sock2, response_header_200Ok, sizeof(response_header_200Ok)-1);
                     write(sock2, buf, data_read);
+                    write(sock2, "\r\n", sizeof("\r\n")-1);
+                    
+                }
+            }
+                        
+            else if (strcmp(buf2+sizeof("html_doc"), "temperature/") == 0)
+            {
+                int data_read = get_temp_humid(buf, 8); 
+                buf[8] = '\0'; 
+                if (data_read > 0) 
+                {
+                    write(sock2, response_header_200Ok, sizeof(response_header_200Ok)-1);
+                    printf("\nttt=%s zzz=%s\n", &buf[6], buf);
+                    write(sock2, &buf[6], 2);
+                    write(sock2, "\r\n", sizeof("\r\n")-1);
+                    
+                }
+            }
+            else if (strcmp(buf2+sizeof("html_doc"), "humidity") == 0)
+            {
+                int data_read = get_temp_humid(buf, 8); 
+                buf[8] = '\0'; 
+                if (data_read > 0) 
+                {
+                    write(sock2, response_header_200Ok, sizeof(response_header_200Ok)-1);
+                    printf("\nttt=%s zzz=%s\n", &buf[2], buf);
+                    write(sock2, &buf[2], 2);
                     write(sock2, "\r\n", sizeof("\r\n")-1);
                     
                 }
@@ -75,9 +107,10 @@ int main()
                 //comp = memcmp(page_name_begin, "/index.htm", sizeof("/index.htm") - 1);
                 if (open_file != -1){
                     write(sock2, response_header_200Ok, sizeof(response_header_200Ok)-1);
-                    bytes_read = read(open_file, buf, sizeof(buf));
                     
-                    write(sock2, buf, bytes_read);
+                    while ((bytes_read = read(open_file, buf, sizeof(buf))) > 0) {
+                        write(sock2, buf, bytes_read);
+                    }
                     write(sock2, "\r\n", sizeof("\r\n")-1);
                 } else {
                     err_file = open(ERROR_404, 0, O_RDONLY);

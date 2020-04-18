@@ -6,16 +6,24 @@
 
 #include "uart.h"
 
+//#define DEBUG_LOGS
+
+#ifdef DEBUG_LOGS
+#define D_LOG printf
+#else
+#define D_LOG
+#endif
+
 int get_temp_humid(char *read_buffer, int size)
 {
     int fd;
     
-    fd = open("/dev/ttyACM0",O_RDWR | O_RDWR);
+    fd = open("/dev/ttyACM0",O_RDWR);
     
     if(fd == -1)    /* Error Checking */
         printf("\n  Error! in Opening ttyACM0  ");
     else
-        printf("\n  ttyACM0 Opened Successfully ");
+        D_LOG("\n  ttyACM0 Opened Successfully ");
 
     struct termios SerialPortSettings;
 
@@ -44,14 +52,14 @@ int get_temp_humid(char *read_buffer, int size)
     SerialPortSettings.c_oflag &= ~OPOST;/*No Output Processing*/
     SerialPortSettings.c_oflag &= ~ONLCR; 
     /* Setting Time outs */
-    SerialPortSettings.c_cc[VMIN] = 10; /* Read at least 10 characters */
+    SerialPortSettings.c_cc[VMIN] = size; /* Read at least size characters */
     SerialPortSettings.c_cc[VTIME] = 0; /* Wait indefinetly   */
 
 
     if((tcsetattr(fd,TCSANOW,&SerialPortSettings)) != 0) /* Set the attributes to the termios structure*/
-        printf("\n  ERROR ! in Setting attributes");
+        D_LOG("\n  ERROR ! in Setting attributes");
     else
-        printf("\n  BaudRate = 9600 \n  StopBits = 1 \n  Parity   = none");
+        D_LOG("\n  BaudRate = 9600 \n  StopBits = 1 \n  Parity   = none");
         
     /* Read data from serial port */
 
@@ -60,8 +68,11 @@ int get_temp_humid(char *read_buffer, int size)
     
     int  bytes_read = 0;    /* Number of bytes read by the read() system call */
     
-
+    write(fd, "m", 1);
     bytes_read = read(fd, read_buffer, size); /* Read the data                   */
+    if (bytes_read != size) {
+        fprintf(stderr, "read=%d requested=%d\n", bytes_read, size);
+    }
         
 
     close(fd); 
