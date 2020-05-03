@@ -11,10 +11,10 @@ void main(void)
         char read_buffer[32];
         int  bytes_read = get_temp_humid(read_buffer, sizeof(read_buffer));
         
-        printf("\n\n  Bytes Rxed - %d", bytes_read); /* Print the number of bytes read */
+        printf("\n\n  Bytes Rxed - %d", bytes_read); 
         printf("\n\n  ");
 
-        for(i=0;i<bytes_read;i++){ /*printing only the received characters*/
+        for(i=0;i<bytes_read;i++){ 
             printf("%c",read_buffer[i]);
         }
         putchar('\n');

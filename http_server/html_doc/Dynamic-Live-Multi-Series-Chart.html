@@ -6,17 +6,16 @@ window.onload = function () {
 
 var dataPoints1 = [];
 var dataPoints2 = [];
-var dataPoints3 = [];
 
 var options = {
 	title: {
-		text: "Temperature in the room"
+		text: "Humidity in the room"
 	},
 	axisX: {
 		title: "chart updates every 2 secs"
 	},
 	axisY: {
-		suffix: "C0",
+		suffix: " %",
 		includeZero: false
 	},
 	toolTip: {
@@ -32,23 +31,47 @@ var options = {
 	data: [{
 		type: "line",
 		xValueType: "dateTime",
-		yValueFormatString: "###.00Wh",
-		xValueFormatString: "hh:mm:ss TT",
-		showInLegend: true,
-		name: "Turbine 1",
-		dataPoints: dataPoints1
-	},
-	{
-		type: "line",
-		xValueType: "dateTime",
-		yValueFormatString: "###.00Wh",
-		showInLegend: true,
-		name: "Turbine 2",
+		yValueFormatString: "###.00%",
+		showInLegend: false,
+		name: "",
 		dataPoints: dataPoints2
 	}]
 };
 
+
+var options2 = {
+	title: {
+		text: "Temprature in the room"
+	},
+	axisX: {
+		title: "chart updates every 2 secs"
+	},
+	axisY: {
+		suffix: " C0",
+		includeZero: false
+	},
+	toolTip: {
+		shared: true
+	},
+	legend: {
+		cursor: "pointer",
+		verticalAlign: "top",
+		fontSize: 22,
+		fontColor: "dimGrey",
+		itemclick: toggleDataSeries
+	},
+	data: [{
+		type: "line",
+		xValueType: "dateTime",
+		yValueFormatString: "###.00C0",
+		showInLegend: false,
+		name: "",
+		dataPoints: dataPoints1
+	}]
+};
+
 var chart = $("#chartContainer").CanvasJSChart(options);
+var chart2 = $("#chartContainer2").CanvasJSChart(options2);
 
 function toggleDataSeries(e) {
 	if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
@@ -59,7 +82,6 @@ function toggleDataSeries(e) {
 	}
 	e.chart.render();
 }
-
 
 function httpGet(theUrl)
 {
@@ -76,7 +98,6 @@ var yValue1 = 0;
 var yValue2 = 0;
 
 var time = new Date;
-// starting at 10.00 am
 time.setHours(10);
 time.setMinutes(00);
 time.setSeconds(00);
@@ -84,38 +105,51 @@ time.setMilliseconds(00);
 
 function updateChart(count) {
 	count = count || 1;
-	var deltaY1, deltaY2;
+	
 	for (var i = 0; i < count; i++) {
 		time.setTime(time.getTime() + updateInterval);
 		
-		yValue1 = Math.round(httpGet('http://127.0.0.1:8080/temperature/'));
 		yValue2 = Math.round(httpGet('http://127.0.0.1:8080/humidity'));
 
-		// pushing the new values
-		dataPoints1.push({
-			x: time.getTime(),
-			y: yValue1
-		});
 		dataPoints2.push({
 			x: time.getTime(),
 			y: yValue2
 		});
 	}
 
-	// updating legend text with  updated with y Value 
-	options.data[0].legendText = "Temperature : " + yValue1 + "C0";
-	options.data[1].legendText = "Turb : " + yValue2 + "Wh";
+	//options.data[0].legendText = " " + yValue2 + "%";
 	$("#chartContainer").CanvasJSChart().render();
 }
-// generates first set of dataPoints 
 updateChart(3);
 setInterval(function () { updateChart() }, updateInterval);
+
+
+function updateChart2(count) {
+	count = count || 1;
+	for (var i = 0; i < count; i++) {
+		time.setTime(time.getTime() + updateInterval);
+		
+		yValue1 = Math.round(httpGet('http://127.0.0.1:8080/temperature/'));
+
+		dataPoints1.push({
+			x: time.getTime(),
+			y: yValue1
+		});
+	}
+
+	//options2.data[0].legendText = " " + yValue1 + "C0";
+	$("#chartContainer2").CanvasJSChart().render();
+}
+updateChart2(3);
+setInterval(function () { updateChart2() }, updateInterval);
+
 
 }
 </script>
 </head>
 <body>
 <div id="chartContainer" style="height: 370px; max-width: 920px; margin: 0px auto;"></div>
+<div id="chartContainer2" style="height: 370px; max-width: 920px; margin: 0px auto;"></div>
 <script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
 <script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
 </body>
